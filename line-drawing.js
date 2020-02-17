@@ -3,8 +3,6 @@
 // License: Apache v2.0 <http://www.apache.org/licenses/LICENSE-2.0.html>
 
 
-class 
-
 const scale = 22;
 let root = d3.select("#demo svg");
 
