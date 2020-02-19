@@ -8,8 +8,8 @@ var song;
 var catchs;
 
 function preload() {
- song = loadSound("https://github.com/tobehonest/webvisuals/blob/master/sounds/backmusic.mp3");
-catchs = loadSound("https://github.com/tobehonest/webvisuals/blob/master/sounds/catch.mp3");
+ song = loadSound("../sounds/loadingmusic.mp3");
+catchs = loadSound("../sounds/catch.mp3");
 }
 
 function setup() {
