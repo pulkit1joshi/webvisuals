@@ -9,7 +9,7 @@ var catchs;
 
 function preload() {
  song = loadSound("https://raw.githubusercontent.com/tobehonest/webvisuals/master/sounds/backmusic.mp3");
-//catchs = loadSound("../sounds/catch.mp3");
+catchs = loadSound("https://raw.githubusercontent.com/tobehonest/webvisuals/master/sounds/catch.mp3");
 }
 
 function setup() {
@@ -188,7 +188,7 @@ function Paddle() {
   }
   
   this.score = function () {
-//catchs.play();
+  catchs.play();
     this.color = color(0,255,0);
     score++;
     this.width+=10;
