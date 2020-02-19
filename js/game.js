@@ -8,8 +8,10 @@ var song;
 var catchs;
 var levelup;
 var alert;
+var speed=5;
 var hard=20;
-var version = 1;
+
+var version = 2;
 
 function preload() {
  song = loadSound("https://raw.githubusercontent.com/tobehonest/webvisuals/master/sounds/backmusic.mp3");
@@ -128,7 +130,7 @@ function keyPressed() {
 function Ball(paddle) {
   this.paddle = paddle;
   this.size = 10;
-  this.speed = 5;
+  this.speed = speed;
   this.bad = (random(0,100) < hard);
   this.init = function() {
   this.x = random(20,width-20);
@@ -204,6 +206,8 @@ function Paddle() {
 	{
 	score=0;
 	hard+=5;
+	speed+=10;
+		total+=20;
 	//levelup.play();
 	this.width=50;
 	}
