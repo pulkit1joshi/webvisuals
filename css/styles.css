@@ -1,0 +1,16 @@
+.page {
+  display: flex;
+  flex-direction: column;
+background-color: black;
+}
+
+#demo {
+  order: 0;
+  padding: 0rem;
+}
+
+#content {
+  order: 999;
+background-color: black;
+color: white;
+}
