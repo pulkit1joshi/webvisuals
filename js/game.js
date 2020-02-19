@@ -1,5 +1,5 @@
 var balls = [];
-var total = 20;
+var total = 50;
 var paddle;
 var score=0;
 var lives=3;
@@ -10,19 +10,21 @@ var levelup;
 var alert;
 var speed=5;
 var hard=20;
+var ggravity=0.03;
+var widthadd=0;
 
-var version = 2;
+var version = 4;
 
 function preload() {
  song = loadSound("https://raw.githubusercontent.com/tobehonest/webvisuals/master/sounds/backmusic.mp3");
 catchs = loadSound("https://raw.githubusercontent.com/tobehonest/webvisuals/master/sounds/catch.mp3");
-//levelup = loadSound("https://raw.githubusercontent.com/tobehonest/webvisuals/master/sounds/NextLevel.mp3");
+levelup = loadSound("https://raw.githubusercontent.com/tobehonest/webvisuals/master/sounds/NextLevel.mp3");
 alert = loadSound("https://raw.githubusercontent.com/tobehonest/webvisuals/master/sounds/Alert.mp3");
 }
 
 function setup() {
 createCanvas(windowWidth-20, windowHeight-20);
- // song.play();
+//song.play();
 song.loop();
   
 }
@@ -42,7 +44,21 @@ function draw() {
   {
     drawend();
   }
+else if(state==3)
+{
+drawwin();
+}
 
+}
+
+function drawwin()
+{
+	textAlign(CENTER,CENTER);
+  noStroke();
+    textSize(30);
+  text("You won this easy game",0,0,width,height);
+    textSize(10);
+  text("Click to play again(V:" + version + ") @by pulkit",0,height/3,width,height);
 }
 
 function drawintro()
@@ -54,7 +70,7 @@ function drawintro()
     textSize(30);
   text("CLICK TO PLAY",0,0,width,height);
     textSize(10);
-  text("While we are building (V:" + version + ")",0,height/3,width,height);
+  text("While we are building (V:" + version + ") @by pulkit",0,height/3,width,height);
 
      
 }
@@ -69,7 +85,7 @@ function drawplaying(){
   paddle.render();
   if(lives==0)
   {
-alert.end();
+alert.stop();
 song.loop();
     gameOver();
   }
@@ -77,6 +93,7 @@ song.loop();
   textAlign(LEFT);
   text("Lives: " + lives, 10,40);
   text("Score: " + score, 10, 20);
+text("Level: " + (hard-20)/5, 10, 60);
 }
 
 function drawend() {
@@ -110,9 +127,18 @@ function startgame()
 
 
 function mousePressed() {
-  if(state==0 || state==2)
+  if(state==0 || state==2 || state==3)
   {
+score=0;
+ lives=3;
+ state=0;
+speed=5;
+ hard=20;
+ ggravity=0.03;
+ widthadd=0;
+
      startgame();
+
   }
 }
 function keyPressed() {
@@ -130,11 +156,16 @@ function keyPressed() {
 function Ball(paddle) {
   this.paddle = paddle;
   this.size = 10;
-  this.speed = speed;
+this.used=0;
+	this.gravity = ggravity;
   this.bad = (random(0,100) < hard);
   this.init = function() {
+  this.bad = (random(0,100) < hard);
   this.x = random(20,width-20);
   this.y = random(-height,-20);
+this.speed = 5;
+this.gravity = ggravity;
+this.used=0;
   }
 
 
@@ -154,8 +185,9 @@ function Ball(paddle) {
   this.update = function()
   {
     this.y += this.speed;
+    this.speed +=this.gravity;
     this.testPaddle();
-    if(this.y + this.size > height+20)
+    if(this.y + this.size > height+20 || this.y + this.size < -40)
     {
           this.init();
     }
@@ -167,21 +199,31 @@ function Ball(paddle) {
     var right = this.x + this.size/2 < this.paddle.x + this.paddle.width;
     if(top && bottom && left && right)
     {
-      if(this.bad) {
+	if(this.used==0)
+	{
+	this.speed = this.speed*-1 + 5;
+	}
+
+      	if(this.bad && this.used ==0) {
         this.paddle.hit();
+	this.used=1;
       }
-      else
+      else if(this.used==0)
       {
+      
       this.paddle.score();
+	this.used=1;
+	
       }
-            this.init();
+
+            
   }
   }
   this.init();
 }
 
 function Paddle() {
-  this.width = 50;
+  this.width = 80;
   this.speed = 30;
   this.height = 30;
   this.color = color(255);
@@ -201,19 +243,24 @@ function Paddle() {
   catchs.play();
     this.color = color(0,255,0);
     score+=1;
-    this.width+=10;
+    this.width+=100/hard;
 	if(score > 20)
 	{
 	score=0;
 	hard+=5;
-	speed+=10;
-		total+=20;
-	//levelup.play();
-	this.width=50;
-	}
-if(hard==50){
-state=0;
+	total+=20;
+	lives=3;
+	alert.stop();
+if(!song.isPlaying()) song.loop();
+	levelup.play();
+	widthadd+=10;
+	ggravity+=0.05;
+	this.width=50+widthadd;
+if(hard>50)
+{
+state=3;
 }
+	}
   }
   
   this.hit = function() {
@@ -222,7 +269,7 @@ state=0;
     this.width -=15;
 if(lives==1)
 {
-song.end();
+song.stop();
 alert.loop();
 }
                        }
