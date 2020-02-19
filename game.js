@@ -7,13 +7,14 @@ var state=0;
 var song;
 
 function preload() {
- song = loadSound("backmusic.mp3");
+ song = loadSound("https://github.com/tobehonest/webvisuals/blob/master/backmusic.mp3");
 }
 
 function setup() {
-  createCanvas(1000, 600);
+createCanvas(windowWidth, windowHeight);
   
-  song.play();
+ // song.play();
+song.loop();
   
 }
 

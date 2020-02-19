@@ -12,7 +12,7 @@
 
 #content {
   border: 0.5px solid gray;
-  order: 1;
-  padding-top: 1rem;
-  padding-left: 0.3rem;
+  order: 999;
+background-color: black;
+color: white;
 }
