@@ -1,77 +1,23 @@
-// From http://www.redblobgames.com/making-of/line-drawing/
-// Copyright 2017 Red Blob Games <redblobgames@gmail.com>
-// License: Apache v2.0 <http://www.apache.org/licenses/LICENSE-2.0.html>
-
-
-const scale = 22;
-let root = d3.select("#demo svg");
-
-for (let x = 0; x < 100; x++) {
-  for (let y = 0; y < 40; y++) {
-    root
-      .append("rect")
-      .attr("transform", `translate(${x * scale}, ${y * scale})`)
-      .attr("width", scale)
-      .attr("height", scale)
-      .attr("fill", "white")
-      .attr("stroke", "gray");
-  }
+var angle=0.00;
+function setup() {
+  createCanvas(windowWidth, 300);
 }
 
-let A = { x: 2, y: 2 },
-  B = { x: 20, y: 8 };
-let gPoints = root.append("g");
-
-function pointsOnLine(P, Q) {
-  let points = [];
-  let N = Math.max(Math.abs(P.x - Q.x), Math.abs(P.y - Q.y));
-  for (let i = 0; i <= N; i++) {
-    let t = i / N;
-    let x = Math.round(P.x + (Q.x - P.x) * t);
-    let y = Math.round(P.y + (Q.y - P.y) * t);
-    points.push({ x: x, y: y });
+function draw() {
+  background(0);
+  var arr= [];
+  var y=[];
+  for(var i=0;i<200;i++)
+  {
+    arr[i] = angle+i/20;
+    y[i] = 150+sin(arr[i])*100;
+    ellipse(10+i*20,y[i],10,10);
+    ellipse(10+i*20,y[i]+10,10,10);
+    ellipse(10+i*20,y[i]+20,10,10);
+    ellipse(10+i*20,y[i]+30,10,10);
+    ellipse(10+i*20,y[i]+40,10,10);
+    
   }
-  return points;
+  ellipse(windowWidth/2+sin(angle/1.5)*windowWidth/2,270,20,20);	
+  angle+=0.01;
 }
-
-function redraw() {
-  let rects = gPoints.selectAll("rect").data(pointsOnLine(A, B));
-  rects.exit().remove();
-  rects
-    .enter()
-    .append("rect")
-    .attr("width", scale - 1)
-    .attr("height", scale - 1)
-    .attr("fill", "hsl(0,40%,70%)")
-    .merge(rects)
-    .attr("transform", p => `translate(${p.x * scale}, ${p.y * scale})`);
-}
-
-function makeDraggableCircle(point) {
-  let circle = root
-    .append("circle")
-    .attr("class", "draggable")
-    .attr("r", scale * 0.75)
-    .attr("fill", "hsl(0,50%,50%)")
-    .call(d3.drag().on("drag", onDrag));
-
-  function updatePosition() {
-    circle.attr(
-      "transform",
-      `translate(${(point.x + 0.5) * scale} ${(point.y + 0.5) * scale})`
-    );
-  }
-
-  function onDrag() {
-    point.x = Math.floor(d3.event.x / scale);
-    point.y = Math.floor(d3.event.y / scale);
-    updatePosition();
-    redraw();
-  }
-
-  updatePosition();
-}
-
-makeDraggableCircle(A);
-makeDraggableCircle(B);
-redraw();
