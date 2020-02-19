@@ -13,7 +13,7 @@ var hard=20;
 function preload() {
  song = loadSound("https://raw.githubusercontent.com/tobehonest/webvisuals/master/sounds/backmusic.mp3");
 catchs = loadSound("https://raw.githubusercontent.com/tobehonest/webvisuals/master/sounds/catch.mp3");
-levelup = loadSound("https://raw.githubusercontent.com/tobehonest/webvisuals/master/sounds/NextLevel.mp3");
+//levelup = loadSound("https://raw.githubusercontent.com/tobehonest/webvisuals/master/sounds/NextLevel.mp3");
 alert = loadSound("https://raw.githubusercontent.com/tobehonest/webvisuals/master/sounds/Alert.mp3");
 }
 
@@ -203,7 +203,7 @@ function Paddle() {
 	{
 	score=0;
 	hard++;
-	levelup.play();
+	//levelup.play();
 	this.width=50;
 	}
 if(hard==50){
