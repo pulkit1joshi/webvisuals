@@ -197,7 +197,7 @@ function Paddle() {
   this.score = function () {
   catchs.play();
     this.color = color(0,255,0);
-    score++;
+    score+=5;
     this.width+=10;
 	if(score > 20)
 	{
@@ -206,6 +206,9 @@ function Paddle() {
 	levelup.play();
 	this.width=50;
 	}
+if(hard==50){
+state=0;
+}
   }
   
   this.hit = function() {
