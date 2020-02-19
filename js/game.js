@@ -6,10 +6,15 @@ var lives=3;
 var state=0;
 var song;
 var catchs;
+var levelup;
+var alert;
+var hard=20;
 
 function preload() {
  song = loadSound("https://raw.githubusercontent.com/tobehonest/webvisuals/master/sounds/backmusic.mp3");
 catchs = loadSound("https://raw.githubusercontent.com/tobehonest/webvisuals/master/sounds/catch.mp3");
+levelup = loadSound("https://raw.githubusercontent.com/tobehonest/webvisuals/master/sounds/Nextlevel.mp3");
+alert = loadSound("https://raw.githubusercontent.com/tobehonest/webvisuals/master/sounds/Alert.mp3");
 }
 
 function setup() {
@@ -61,6 +66,8 @@ function drawplaying(){
   paddle.render();
   if(lives==0)
   {
+alert.end();
+song.loop();
     gameOver();
   }
   textSize(20);
@@ -121,7 +128,7 @@ function Ball(paddle) {
   this.paddle = paddle;
   this.size = 10;
   this.speed = 5;
-  this.bad = (random(0,100) < 20);
+  this.bad = (random(0,100) < hard);
   this.init = function() {
   this.x = random(20,width-20);
   this.y = random(-height,-20);
@@ -192,12 +199,24 @@ function Paddle() {
     this.color = color(0,255,0);
     score++;
     this.width+=10;
+	if(score > 20)
+	{
+	score=0;
+	hard++;
+	levelup.play();
+	this.width=50;
+	}
   }
   
   this.hit = function() {
     this.color = color(255,0,0);
     lives--;
     this.width -=15;
+if(lives==1)
+{
+song.end();
+alert.loop();
+}
                        }
   
   this.moveright = function () {
