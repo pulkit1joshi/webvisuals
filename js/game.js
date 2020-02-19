@@ -9,6 +9,7 @@ var catchs;
 var levelup;
 var alert;
 var hard=20;
+var version = 1;
 
 function preload() {
  song = loadSound("https://raw.githubusercontent.com/tobehonest/webvisuals/master/sounds/backmusic.mp3");
@@ -51,7 +52,7 @@ function drawintro()
     textSize(30);
   text("CLICK TO PLAY",0,0,width,height);
     textSize(10);
-  text("While we are building",0,height/3,width,height);
+  text("While we are building (V:" + version + ")",0,height/3,width,height);
 
      
 }
