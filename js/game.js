@@ -108,7 +108,17 @@ function drawplaying() {
     generation+=1;
     if(generation%10==0) hard++;
     if(hard>40) hard=40;
+    let sum=0;
+    for(let paddle of savedpaddles)
+    {
+      sum+=paddle.score;
+    }
+    if(sum > generationfitness)
+    {
+    generationfitness=sum;
+  }
     nextGeneration();
+
     score=0;
     for(let i=0;i<total;i++)
     {
