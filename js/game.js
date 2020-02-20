@@ -3,7 +3,7 @@ var total = 50;
 var paddle;
 var score = 0;
 var lives = 1000;
-var state = 0;
+var state = 1;
 var song;
 var catchs;
 var levelup;
@@ -107,7 +107,7 @@ function gameOver() {
 }
 
 function startgame() {
-  state = 2;
+  state = 1;
   lives = 1000;
   score = 0;
   paddle = new Paddle();
