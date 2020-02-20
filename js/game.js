@@ -1,19 +1,25 @@
+const totalpaddles=10;
 var balls = [];
 var total = 50;
-var paddle;
+var paddles = [];
 var score = 0;
-var lives = 1000;
-var state = 1;
+var lives = totalpaddles;
+var state = 0;
 var song;
 var catchs;
 var levelup;
 var alert;
 var speed = 5;
-var hard = 20;
-var ggravity = 0.03;
+var hard = 40;
+var ggravity = 0.08;
 var widthadd = 0;
-
-var version = 4;
+let savedpaddles= [];
+var version = 5;
+var generation=1;
+let slider;
+var generationfitness=0;
+let hardslider;
+let ballsslider;
 
 function preload() {
   song = loadSound("https://raw.githubusercontent.com/tobehonest/webvisuals/master/sounds/backmusic.mp3");
@@ -23,15 +29,25 @@ function preload() {
 }
 
 function setup() {
+
   createCanvas(windowWidth - 20, windowHeight - 20);
+
+    slider = createSlider(1,100,5);
+  hardslider = createSlider(1,100,40);
+  //ballsslider = createSlider(40,1000,50);
   //song.play();
-  song.loop();
+  if (!song.isPlaying()) song.loop();
+  for(let i=0;i<totalpaddles;i++)
+    {
+      paddles[i] = new Paddle();
+    }
 
 }
 
 function draw() {
   background(0);
-
+  hard = hardslider.value();
+ // total= ballsslider.value();
   if (state == 0) {
     drawintro();
   }
@@ -61,7 +77,6 @@ function drawwin() {
 
 function drawintro() {
   fill(255);
-
   textAlign(CENTER, CENTER);
   noStroke();
   textSize(30);
@@ -77,20 +92,36 @@ function drawplaying() {
     balls[i].update();
     balls[i].render();
   }
-  paddle.think();
-  paddle.update();
-  paddle.render();
+  for(let paddle of paddles)
+  {
+    paddle.think();
+    paddle.update();
+    paddle.render();
+  }
   if (lives == 0) {
     alert.stop();
-    song.loop();
-    gameOver();
+    if (!song.isPlaying()) song.loop();
+    lives=totalpaddles;
+    generation+=1;
+    for(let i=0;i<totalpaddles;i++)
+    {
+      nextGeneration();
+      score=0;
+      for(let i=0;i<total;i++)
+      {
+        balls[i].y = -70;
+      }
+    }
   }
   textSize(20);
   textAlign(LEFT);
-  text("Lives: " + lives, 10, 40);
-  text("Score: " + score, 10, 20);
-  text("Level: " + (hard - 20) / 5, 10, 60);
-  text("Probability: " + paddle.prob, 10, 80);
+  text("Harshness: " + hard, 10, 100);
+  text("Population: " + lives, 10, 40);
+  text("Generation Score: " + score, 10, 20);
+  //text("Level: " + (hard - 20) / 5, 10, 60);
+  text("Generation: " + generation, 10, 60);
+  text("Generation Fitness: " + generationfitness, 10, 80);
+  //text("Probability: " + paddle.prob, 10, 80);
 }
 
 function drawend() {
@@ -108,11 +139,10 @@ function gameOver() {
 
 function startgame() {
   state = 1;
-  lives = 1000;
+  lives = totalpaddles;
   score = 0;
-  paddle = new Paddle();
   for (var i = 0; i < total; i++) {
-    balls[i] = new Ball(paddle);
+    balls[i] = new Ball(paddles);
   }
   textFont("Helvetica");
 
@@ -125,7 +155,7 @@ function mousePressed() {
     score = 0;
     lives = 3;
     state = 0;
-    speed = 5;
+    speed = 10;
     hard = 20;
     ggravity = 0.03;
     widthadd = 0;
@@ -145,17 +175,29 @@ function mousePressed() {
 
 
 
-function Ball(paddle) {
-  this.paddle = paddle;
+function Ball(paddles) {
+  //this.paddle = paddle;
   this.size = 10;
   this.used = 0;
   this.gravity = ggravity;
-  this.bad = (random(0, 100) < hard);
   this.init = function () {
     this.bad = (random(0, 100) < hard);
     this.x = random(20, width - 20);
+    if(this.bad)
+    {
+      var y = random(0,100);
+      if(y>= 70)
+      {
+      this.x = random(0,50);
+      var right = random(0,100);
+      if(right >= 50)
+      {
+        this.x = random(width-this.width,width - 100);
+      }
+      }
+    }
     this.y = random(-height, -20);
-    this.speed = 5;
+    this.speed = 5;//+slider.value();
     this.gravity = ggravity;
     this.used = 0;
   }
@@ -182,57 +224,101 @@ function Ball(paddle) {
     }
   }
   this.testPaddle = function () {
-    var top = this.y + this.size / 2 > this.paddle.y;
-    var bottom = this.y - this.size / 2 < this.paddle.y + this.paddle.height;
-    var left = this.x + this.size / 2 > this.paddle.x;
-    var right = this.x + this.size / 2 < this.paddle.x + this.paddle.width;
+    let yes=false;
+    for(paddle of paddles)
+    {
+    var top = this.y + this.size / 2 > paddle.y;
+    var bottom = this.y - this.size / 2 < paddle.y + paddle.height;
+    var left = this.x + this.size / 2 > paddle.x;
+    var right = this.x + this.size / 2 < paddle.x + paddle.width;
     if (top && bottom && left && right) {
       if (this.used == 0) {
-        this.speed = this.speed * -1 + 5;
+        //this.speed = this.speed * -1+ 5;
       }
 
       if (this.bad && this.used == 0) {
-        this.paddle.hit();
-        this.used = 1;
+        paddle.lives-=1;
+        if(paddle.lives==0)
+        {
+          savedpaddles.push(paddle);
+          console.log(paddle);
+        }
+        paddle.hit();
+        //this.used = 1;
+        yes=true;
       }
       else if (this.used == 0) {
-
-        this.paddle.score();
-        this.used = 1;
-
+        paddle.scored();
+        //this.used = 1;
+        yes=true;
       }
-
+    }
 
     }
+    if(yes==true) this.used=1;
+    this.speed = this.speed*-1+5;
   }
   this.init();
 }
 
-function Paddle() {
+function Paddle(brain) {
+  this.dist=0;
+  this.score=0;
+  this.fitness=0;
+  this.lives=1;
   this.prob=0;
   this.width = 80;
-  this.speed = 30;
+  this.speed = 30;//+slider.value();
   this.height = 30;
-  this.color = color(255);
+  this.color = color(random(100,255));
+  this.rcolor = this.color;
   this.x = width / 2 - this.width / 2;
   this.y = height - 30;
-  this.brain = new NeuralNetwork(total*2+3,4,1);
+  if(brain)
+  {
+    this.brain = brain.copy();
+  }
+  else
+  {
+    this.brain = new NeuralNetwork(total*2+3,4,1);
+  }
   this.update = function () {
   }
 
   this.render = function () {
+    if(this.width > 120) 
+      {
+        this.width=80;
+        this.score+=10;
+      }
+    if(this.lives > 0)
+    {
+          fill(this.rcolor); rect(this.x, this.y, this.width, this.height);
+          this.rcolor=this.color;
+    }
+    else
+    {
+      this.width=1;
+      this.x=-50;
+      this.y=-50;
+    }
 
-    fill(this.color); rect(this.x, this.y, this.width, this.height);
-    this.color = color(255);
 
   }
 
-  this.score = function () {
+  this.mutate = function()
+  {
+
+  }
+
+  this.scored = function () {
     catchs.play();
-    this.color = color(0, 255, 0);
-    score += 1;
+    this.rcolor = color(0, 255, 0);
+    this.score +=1;
+    if(this.x != width - this.width && this.x != 0) score+=5;
+    score++;
     this.width += 100 / hard;
-    if (score > 20) {
+    if (score < -1) {
       score = 0;
       hard += 5;
       total += 20;
@@ -250,45 +336,50 @@ function Paddle() {
   }
 
   this.hit = function () {
-    this.color = color(255, 0, 0);
-    lives--;
+    this.rcolor = color(255, 0, 0);
+    if(this.lives==0) lives--;
     this.width -= 15;
     if (lives == 1) {
-      song.stop();
-      alert.loop();
+      //song.stop();
+      //alert.loop();
     }
   }
 
   this.moveright = function () {
     this.x += this.speed;
+    this.dist+=this.speed;
     if (this.x + this.width > width) {
       this.x = width - this.width;
     }
   }
   this.moveleft = function () {
     this.x -= this.speed;
+    this.dist+=this.speed;
     if (this.x < 0) {
       this.x = 0;
     }
   }
   this.think = function() {
+    if(this.lives > 0)
+    {
     let inputs = [];
-    inputs[0] = this.x;
-    inputs[1] = this.y;
-    inputs[2] =this.width;
+    inputs[0] = this.x/width;
+    inputs[1] = this.y/width;
+    inputs[2] =this.width/width;
     for(var i=0;i<total;i++)
     {
-      inputs[i+3] = balls[i].x;
+      inputs[i+3] = balls[i].x/width;
     }
     for(var i=0;i<total;i++)
     {
-      inputs[total+i+3] = balls[i].y;
+      inputs[total+i+3] = balls[i].y/height;
     }
     let output = this.brain.predict(inputs);
-    if(output > 0.3) {
+    if(output[0] > 0.5) {
       this.moveleft();
     }
-    else if(output <= 0.2) this.moveright();
+    else if(output[0] <= 0.5) this.moveright();
     this.prob=output;
+  }
   }
 }
