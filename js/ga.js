@@ -10,26 +10,26 @@ function nextGeneration()
 }
 
 function pickOne() {
-	let randpad = new Paddle();
-	//console.log(savedpaddles);
-	var maxfitness=-100000;
 	var index=0;
-	for(var i=0;i<savedpaddles.length;i++)
-	{
-		if(savedpaddles[i].fitness > maxfitness) 
-		{
-			maxfitness=savedpaddles[i].fitness;
-			randpad = savedpaddles[i];
-			generationfitness = maxfitness;
-		}
+	var r = random(1)
+
+	while(r >0) {
+		console.log(index)
+		r = r - savedpaddles[index].fitness;
+		index++;
 	}
-	let child = new Paddle(randpad.brain);
+	index--;
+	let child = new Paddle(savedpaddles[index].brain);
 	child.mutate(0.1);
 	return child;
 }
 function calculateFitness() {
 	let sum = 0;
 	let dissum =0;
+	if(sum > generationfitness)
+	{
+	generationfitness=sum;
+	}
 	for(let paddle of savedpaddles)
 	{
 		sum+=paddle.score;

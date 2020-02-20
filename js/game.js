@@ -122,7 +122,7 @@ function drawplaying() {
   text("Generation Score: " + score, 10, 20);
   //text("Level: " + (hard - 20) / 5, 10, 60);
   text("Generation: " + generation, 10, 60);
-  text("Generation Fitness: " + generationfitness, 10, 80);
+  text("Max-Score Fitness: " + generationfitness, 10, 80);
   //text("Probability: " + paddle.prob, 10, 80);
 }
 
@@ -314,9 +314,9 @@ function Paddle(brain) {
 
   }
 
-  this.mutate = function()
+  this.mutate = function(rate)
   {
-
+      this.brain.mutate(rate);
   }
 
   this.scored = function () {
