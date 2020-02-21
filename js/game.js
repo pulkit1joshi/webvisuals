@@ -20,6 +20,7 @@ let slider;
 var generationfitness=0;
 let hardslider;
 let ballsslider;
+let speedup=1;
 
 function preload() {
   song = loadSound("https://raw.githubusercontent.com/tobehonest/webvisuals/master/sounds/backmusic.mp3");
@@ -32,7 +33,7 @@ function setup() {
 
   createCanvas(windowWidth - 20, windowHeight - 20);
 
-    slider = createSlider(1,100,5);
+    slider = createSlider(1,500,5);
   hardslider = createSlider(1,100,hard);
   //ballsslider = createSlider(40,1000,50);
   //song.play();
@@ -46,6 +47,7 @@ function setup() {
 
 function draw() {
   background(0);
+  speedup=slider.value();
   hard = hardslider.value();
  // total= ballsslider.value();
   if (state == 0) {
@@ -192,7 +194,7 @@ function Ball(paddles) {
   this.size = 10;
   this.used = 0;
   this.gravity = ggravity;
-  this.speed = speed;
+  this.speed = speed*speedup;
   this.init = function () {
     this.bad = (random(0, 100) < hard);
     this.x = random(20, width - 20);
@@ -212,7 +214,7 @@ function Ball(paddles) {
     this.y = random(-height, -20);
     this.gravity = ggravity;
     this.used = 0;
-    this.speed = speed;
+    this.speed = speed*speedup;
   }
 
 
@@ -286,7 +288,7 @@ function Paddle(brain) {
   this.lives=1;
   this.prob=0;
   this.width = 80;
-  this.speed = 30;//+slider.value();
+  this.speed = 30*slider.value();
   this.height = 30;
   this.color = color(random(100,255));
   this.rcolor = this.color;
@@ -386,11 +388,26 @@ function Paddle(brain) {
     inputs[2] =this.width/width;
     for(var i=0;i<total;i++)
     {
+      if(balls[i].bad)
+      {
       inputs[i+3] = balls[i].x/width;
+      }
+      else
+      {
+        inputs[i+3] = 0;
+      }
     }
     for(var i=0;i<total;i++)
     {
-      inputs[total+i+3] = balls[i].y/height;
+      //inputs[total+i+3] = balls[i].y/height;
+      if(balls[i].bad)
+      {
+      inputs[i+total+3] = balls[i].x/width;
+      }
+      else
+      {
+        inputs[i+total+3] = 0;
+      }
     }
     let output = this.brain.predict(inputs);
     if(output[0] > 0.5) {
